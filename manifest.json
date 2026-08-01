@@ -1,0 +1,17 @@
+{
+  "name": "JOD PRANK TOOL",
+  "short_name": "JOD X",
+  "description": "JOD's Ultimate Cyber Control System",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#050505",
+  "theme_color": "#00ff00",
+  "icons": [
+    {
+      "src": "https://i.postimg.cc/BvPQP8dK/file-000000004cd8820bbee0e6f2cba39cde.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
