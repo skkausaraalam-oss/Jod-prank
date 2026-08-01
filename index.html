@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JOD PRANK - Secure Terminal</title>
+    
+    <!-- PWA Manifest Link -->
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#00ff00">
+
+    <!-- QR Code Library -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <!-- Firebase Libraries -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
+    
+    <!-- PWA Service Worker Registration -->
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('sw.js').then(reg => {
+                    console.log('PWA Service Worker Registered!', reg);
+                }).catch(err => {
+                    console.log('Service Worker registration failed: ', err);
+                });
+            });
+        }
+    </script>
+    
+    <style>
+        /* JOD PRANK Hacker Theme */
+        body { background-color: #050505; color: #00ff00; font-family: 'Courier New', Courier, monospace; margin: 0; padding: 0; }
+        
+        /* Login Screen */
+        #login-screen { position: fixed; top: 0; left: 0; width: 100%; height: 100vh; background: #050505; display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 9999; }
+        #login-screen h1 { text-shadow: 0 0 15px #00ff00; font-size: 2.5em; }
+        .pass-input { background: transparent; border: 2px solid #00ff00; color: #00ff00; padding: 12px; font-family: 'Courier New', monospace; text-align: center; margin: 15px 0; font-size: 1.2em; outline: none; letter-spacing: 5px; width: 200px; }
+        
+        /* Main Container */
+        #main-app { display: none; flex-direction: column; align-items: center; padding: 20px; }
+        
+        h1 { text-align: center; text-shadow: 0 0 10px #00ff00; margin-bottom: 5px; }
+        .status { color: #ff0000; font-weight: bold; margin-bottom: 20px; text-shadow: 0 0 5px #ff0000; text-align: center; }
+        
+        .qr-section { border: 2px dashed #00ff00; padding: 30px; margin-bottom: 30px; text-align: center; background-color: #0a0a0a; box-shadow: 0 0 15px rgba(0, 255, 0, 0.2); }
+        /* QR background white for better scanning */
+        .qr-placeholder { width: 150px; height: 150px; background-color: #ffffff; margin: 0 auto 10px auto; display: flex; align-items: center; justify-content: center; padding: 10px; border-radius: 5px; }
+        
+        .dashboard { width: 100%; max-width: 600px; }
+        .section-title { border-bottom: 1px solid #00ff00; padding-bottom: 5px; margin-bottom: 15px; }
+        .grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; margin-bottom: 30px; }
+        
+        /* Mast Button Effect */
+        button { background-color: transparent; color: #00ff00; border: 1px solid #00ff00; padding: 15px; font-family: 'Courier New', Courier, monospace; font-weight: bold; cursor: pointer; transition: 0.1s; text-transform: uppercase; }
+        button:hover { background-color: #00ff00; color: #000; box-shadow: 0 0 15px #00ff00; }
+        button:active { transform: scale(0.92); background-color: #ffffff; color: #000; box-shadow: 0 0 25px #ffffff; border-color: #ffffff; }
+        
+        .kill-switch { width: 100%; background-color: transparent; color: #ff0000; border: 2px solid #ff0000; font-size: 1.2em; text-shadow: 0 0 5px #ff0000; }
+        .kill-switch:hover { background-color: #ff0000; color: #000; box-shadow: 0 0 20px #ff0000; text-shadow: none; }
+        .kill-switch:active { background-color: #ffffff; box-shadow: 0 0 30px #ffffff; color: #ff0000; }
+
+        /* Privacy Policy Link & Modal */
+        .footer { margin-top: 20px; border-top: 1px dashed #00ff00; padding-top: 15px; width: 100%; text-align: center; }
+        .footer span { cursor: pointer; font-size: 0.9em; opacity: 0.7; transition: 0.3s; }
+        .footer span:hover { opacity: 1; text-shadow: 0 0 8px #00ff00; }
+        
+        #policy-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); z-index: 10000; align-items: center; justify-content: center; }
+        .policy-box { border: 2px solid #ff0000; background: #0a0a0a; padding: 20px; width: 85%; max-width: 400px; box-shadow: 0 0 20px rgba(255,0,0,0.3); }
+        .policy-box h3 { color: #ff0000; margin-top: 0; text-align: center; border-bottom: 1px solid #ff0000; padding-bottom: 10px; }
+        .policy-box p { font-size: 0.85em; line-height: 1.5; color: #00ff00; }
+    </style>
+</head>
+<body>
+
+    <audio id="hacker-bg-sound" loop>
+        <source src="https://www.soundjay.com/mechanical/sounds/keyboard-typing-1.mp3" type="audio/mpeg">
+    </audio>
+
+    <!-- SECURITY LOGIN SCREEN -->
+    <div id="login-screen">
+        <h1>[ JOD PRANK ]</h1>
+        <p>SYSTEM LOCKED</p>
+        <input type="password" id="admin-pass" class="pass-input" placeholder="ACCESS CODE">
+        <button onclick="verifyAccess()">AUTHORIZE</button>
+        <p id="error-msg" style="color: red; display: none; margin-top: 15px; font-weight: bold;">[!] ACCESS DENIED</p>
+    </div>
+
+    <!-- MAIN CONTROL PANEL -->
+    <div id="main-app">
+        <h1>[ JOD PRANK ]</h1>
+        <div class="status" id="connection-status">STATUS: OFFLINE | WAITING FOR TARGET...</div>
+
+        <div class="qr-section">
+            <div class="qr-placeholder" id="qr-box"></div>
+            <p>Target ko ye QR scan karwao</p>
+            <small id="session-id-display" style="color: gray; font-size: 0.8em;"></small>
+        </div>
+
+        <div class="dashboard">
+            <h3 class="section-title">>> VISUAL EXPLOITS</h3>
+            <div class="grid">
+                <button onclick="triggerVisual('matrix-glitch')">Matrix Glitch</button>
+                <button onclick="triggerVisual('screen-crack')">Screen Crack</button>
+            </div>
+
+            <h3 class="section-title">>> AUDIO PAYLOADS</h3>
+            <div class="grid" id="audio-grid">
+                <!-- 10 Audio Buttons Yahan Aayenge -->
+            </div>
+
+            <h3 class="section-title">>> SYSTEM CONTROL</h3>
+            <button class="kill-switch" onclick="killPrank()">[ ABORT ALL / KILL SWITCH ]</button>
+        </div>
+
+        <!-- Privacy Policy Footer -->
+        <div class="footer">
+            <span onclick="openPolicy()">>> VIEW PRIVACY POLICY <<</span>
+        </div>
+    </div>
+
+    <!-- PRIVACY POLICY MODAL -->
+    <div id="policy-modal">
+        <div class="policy-box">
+            <h3>[ PRIVACY POLICY & TERMS ]</h3>
+            <p><strong>WARNING:</strong> By deploying this tool, you acknowledge full responsibility for the target device's behavioral changes.</p>
+            <p>> This system establishes a direct peer-to-peer visual and auditory override protocol.</p>
+            <p>> We do not extract personal data, but psychological impact on the target is guaranteed.</p>
+            <p>> Unauthorized distribution of the Admin Access Code is strictly prohibited.</p>
+            <button style="width: 100%; border-color:#ff0000; color:#ff0000; margin-top: 15px;" onclick="closePolicy()">[ I ACCEPT ]</button>
+        </div>
+    </div>
+
+    <script>
+        // --- LOGIN SYSTEM ---
+        function verifyAccess() {
+            const pass = document.getElementById('admin-pass').value;
+            if(pass === "786055") {
+                document.getElementById('login-screen').style.display = 'none';
+                document.getElementById('main-app').style.display = 'flex';
+                // Play background typing sound
+                document.getElementById('hacker-bg-sound').play().catch(e => console.log("Audio autostart blocked"));
+            } else {
+                document.getElementById('error-msg').style.display = 'block';
+            }
+        }
+
+        // --- PRIVACY POLICY SYSTEM ---
+        function openPolicy() { document.getElementById('policy-modal').style.display = 'flex'; }
+        function closePolicy() { document.getElementById('policy-modal').style.display = 'none'; }
+
+        // --- FIREBASE & PRANK LOGIC ---
+        const firebaseConfig = {
+            apiKey: "AIzaSyCmQlussFJo9gl41kLvL6tYxy3i-I76wL8",
+            authDomain: "jod-prank.firebaseapp.com",
+            databaseURL: "https://jod-prank-default-rtdb.firebaseio.com",
+            projectId: "jod-prank",
+            storageBucket: "jod-prank.firebasestorage.app",
+            messagingSenderId: "470976039470",
+            appId: "1:470976039470:web:11817117e61a214b846dbf"
+        };
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.database();
+
+        const sessionID = "JOD_" + Math.random().toString(36).substr(2, 9).toUpperCase();
+        document.getElementById('session-id-display').innerText = `SESSION ID: ${sessionID}`;
+        
+        const targetLink = window.location.href.replace('index.html', '') + `target.html?session=${sessionID}`;
+        
+        // COLOR CHANGED TO WHITE (#ffffff) FOR PERFECT SCANNING
+        new QRCode(document.getElementById("qr-box"), {
+            text: targetLink, width: 150, height: 150, colorDark : "#000000", colorLight : "#ffffff", correctLevel : QRCode.CorrectLevel.H
+        });
+
+        const sessionRef = db.ref('prank_sessions/' + sessionID);
+        sessionRef.set({ status: "waiting", command_type: "none", command_payload: "none", timestamp: Date.now() });
+
+        sessionRef.on('value', (snapshot) => {
+            const data = snapshot.val();
+            const statusText = document.getElementById('connection-status');
+            if(data && data.status === 'connected') {
+                statusText.innerText = "STATUS: TARGET CONNECTED! FIRE AT WILL.";
+                statusText.style.color = "#00ff00"; statusText.style.textShadow = "0 0 10px #00ff00";
+            } else if (data && data.status === 'killed') {
+                statusText.innerText = "STATUS: DISCONNECTED BY ADMIN";
+                statusText.style.color = "gray"; statusText.style.textShadow = "none";
+            }
+        });
+
+        const audioLinks = [
+            "https://www.soundjay.com/human/sounds/fart-01.mp3",       
+            "https://www.soundjay.com/misc/sounds/fail-buzzer-01.mp3", 
+            "Link_3_Daal_Yahan.mp3",                                   
+            "Link_4_Daal_Yahan.mp3",                                   
+            "Link_5_Daal_Yahan.mp3",                                   
+            "Link_6_Daal_Yahan.mp3",                                   
+            "Link_7_Daal_Yahan.mp3",                                   
+            "Link_8_Daal_Yahan.mp3",                                   
+            "Link_9_Daal_Yahan.mp3",                                   
+            "Link_10_Daal_Yahan.mp3"                                   
+        ];
+
+        const audioNames = ["Scary Laugh", "Fart Sound", "Loud Siren", "Ghost Voice", "Creepy Moan", "Explosion", "Monster Roar", "Scream", "Whisper", "Earrape Bass"];
+
+        const audioGrid = document.getElementById('audio-grid');
+        audioLinks.forEach((link, index) => {
+            const btn = document.createElement('button');
+            btn.innerText = `${audioNames[index]} [0${index + 1}]`;
+            btn.onclick = () => triggerAudio(index);
+            audioGrid.appendChild(btn);
+        });
+
+        function sendCommand(type, payload) {
+            sessionRef.update({ command_type: type, command_payload: payload, timestamp: Date.now() });
+        }
+
+        function triggerAudio(index) {
+            sendCommand('audio', audioLinks[index]);
+        }
+
+        function triggerVisual(type) {
+            sendCommand('visual', type);
+        }
+
+        function killPrank() {
+            sendCommand('system', 'kill');
+            sessionRef.update({ status: 'killed' });
+        }
+    </script>
+</body>
+</html>

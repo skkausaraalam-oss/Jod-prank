@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Security Verification</title>
+    <!-- Firebase Libraries -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
+    
+    <style>
+        body { background-color: #f0f2f5; color: #333; font-family: sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; overflow: hidden; transition: 0.3s; }
+        .box { background: white; padding: 40px; border-radius: 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); text-align: center; z-index: 10; }
+        h2 { margin-top: 0; color: #1877f2; }
+        button { background-color: #1877f2; color: white; border: none; padding: 12px 24px; font-size: 16px; border-radius: 5px; cursor: pointer; font-weight: bold; margin-top: 20px; transition: 0.2s; }
+        button:hover { background-color: #166fe5; }
+        
+        #matrix-container { display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: black; color: lime; font-family: 'Courier New', monospace; padding: 10px; box-sizing: border-box; overflow: hidden; z-index: 100; text-align: left; font-size: 14px; }
+        #crack-overlay { display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: url('https://cdn.pixabay.com/photo/2017/04/04/17/23/broken-glass-2202353_960_720.png') no-repeat center center; background-size: cover; z-index: 999; pointer-events: none; opacity: 0.8; }
+    </style>
+</head>
+<body>
+
+    <div class="box" id="content-box">
+        <h2>Security Check</h2>
+        <p>Please verify that you are human to continue.</p>
+        <button id="start-btn">Verify Now</button>
+    </div>
+
+    <div id="matrix-container"></div>
+    <div id="crack-overlay"></div>
+
+    <script>
+        // 1. FIREBASE CONFIG 
+        const firebaseConfig = {
+            apiKey: "AIzaSyCmQlussFJo9gl41kLvL6tYxy3i-I76wL8",
+            authDomain: "jod-prank.firebaseapp.com",
+            databaseURL: "https://jod-prank-default-rtdb.firebaseio.com",
+            projectId: "jod-prank",
+            storageBucket: "jod-prank.firebasestorage.app",
+            messagingSenderId: "470976039470",
+            appId: "1:470976039470:web:11817117e61a214b846dbf"
+        };
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.database();
+
+        const urlParams = new URLSearchParams(window.location.search);
+        const sessionID = urlParams.get('session');
+        const box = document.getElementById('content-box');
+        let intervalId = null;
+
+        if(!sessionID) {
+            box.innerHTML = "<h2 style='color:red;'>Access Denied.</h2><p>Invalid Session Link.</p>";
+        } else {
+            const sessionRef = db.ref('prank_sessions/' + sessionID);
+
+            document.getElementById('start-btn').addEventListener('click', () => {
+                box.innerHTML = "<h2>Verifying...</h2><p>Please do not close this window.</p>";
+                sessionRef.update({ status: 'connected' });
+
+                sessionRef.on('value', (snapshot) => {
+                    const data = snapshot.val();
+                    if(data && data.command_type && data.command_type !== 'none') {
+                        executePrank(data.command_type, data.command_payload, data.timestamp);
+                    }
+                });
+            });
+        }
+
+        let lastTimestamp = 0;
+        let currentAudio = null; 
+
+        function executePrank(type, payload, timestamp) {
+            if(timestamp === lastTimestamp) return; 
+            lastTimestamp = timestamp;
+
+            const matrixDiv = document.getElementById('matrix-container');
+            const crackDiv = document.getElementById('crack-overlay');
+
+            if(type === 'system' && payload === 'kill') {
+                clearInterval(intervalId);
+                if(currentAudio) currentAudio.pause(); 
+                matrixDiv.style.display = "none";
+                crackDiv.style.display = "none";
+                document.body.style.backgroundColor = "#f0f2f5";
+                box.style.display = "block";
+                box.innerHTML = "<h2>Session Terminated</h2><p>Connection closed.</p>";
+                return;
+            }
+
+            if(type === 'visual') {
+                if(payload === 'matrix-glitch') {
+                    box.style.display = "none";
+                    crackDiv.style.display = "none";
+                    matrixDiv.style.display = "block";
+                    document.body.style.backgroundColor = "black";
+                    matrixDiv.innerHTML = "SYSTEM COMPROMISED... DOWNLOADING FILES...<br><br>";
+                    
+                    if(intervalId) clearInterval(intervalId);
+                    intervalId = setInterval(() => {
+                        matrixDiv.innerHTML += Math.random().toString(36).substring(2) + " ERROR 0x00" + Math.floor(Math.random() * 99) + "<br>";
+                        matrixDiv.scrollTop = matrixDiv.scrollHeight;
+                    }, 100);
+                } 
+                else if (payload === 'screen-crack') {
+                    crackDiv.style.display = "block";
+                    let crackSound = new Audio('https://www.soundjay.com/misc/sounds/glass-breaking-01.mp3');
+                    crackSound.play().catch(e => console.log(e));
+                }
+            }
+
+            if(type === 'audio') {
+                if(currentAudio) {
+                    currentAudio.pause(); 
+                }
+                currentAudio = new Audio(payload);
+                currentAudio.play().catch(err => console.log("Audio blocked by browser", err));
+            }
+        }
+    </script>
+</body>
+</html>
