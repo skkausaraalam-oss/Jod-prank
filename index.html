@@ -5,17 +5,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>JOD PRANK - Secure Terminal</title>
     
-    <!-- PWA Manifest Link -->
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#00ff00">
 
-    <!-- QR Code Library -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
-    <!-- Firebase Libraries -->
     <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
     
-    <!-- PWA Service Worker Registration -->
     <script>
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
@@ -29,42 +25,27 @@
     </script>
     
     <style>
-        /* JOD PRANK Hacker Theme */
         body { background-color: #050505; color: #00ff00; font-family: 'Courier New', Courier, monospace; margin: 0; padding: 0; }
-        
-        /* Login Screen */
         #login-screen { position: fixed; top: 0; left: 0; width: 100%; height: 100vh; background: #050505; display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 9999; }
         #login-screen h1 { text-shadow: 0 0 15px #00ff00; font-size: 2.5em; }
         .pass-input { background: transparent; border: 2px solid #00ff00; color: #00ff00; padding: 12px; font-family: 'Courier New', monospace; text-align: center; margin: 15px 0; font-size: 1.2em; outline: none; letter-spacing: 5px; width: 200px; }
-        
-        /* Main Container */
         #main-app { display: none; flex-direction: column; align-items: center; padding: 20px; }
-        
         h1 { text-align: center; text-shadow: 0 0 10px #00ff00; margin-bottom: 5px; }
         .status { color: #ff0000; font-weight: bold; margin-bottom: 20px; text-shadow: 0 0 5px #ff0000; text-align: center; }
-        
         .qr-section { border: 2px dashed #00ff00; padding: 30px; margin-bottom: 30px; text-align: center; background-color: #0a0a0a; box-shadow: 0 0 15px rgba(0, 255, 0, 0.2); }
-        /* QR background white for better scanning */
         .qr-placeholder { width: 150px; height: 150px; background-color: #ffffff; margin: 0 auto 10px auto; display: flex; align-items: center; justify-content: center; padding: 10px; border-radius: 5px; }
-        
         .dashboard { width: 100%; max-width: 600px; }
         .section-title { border-bottom: 1px solid #00ff00; padding-bottom: 5px; margin-bottom: 15px; }
         .grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; margin-bottom: 30px; }
-        
-        /* Mast Button Effect */
         button { background-color: transparent; color: #00ff00; border: 1px solid #00ff00; padding: 15px; font-family: 'Courier New', Courier, monospace; font-weight: bold; cursor: pointer; transition: 0.1s; text-transform: uppercase; }
         button:hover { background-color: #00ff00; color: #000; box-shadow: 0 0 15px #00ff00; }
         button:active { transform: scale(0.92); background-color: #ffffff; color: #000; box-shadow: 0 0 25px #ffffff; border-color: #ffffff; }
-        
         .kill-switch { width: 100%; background-color: transparent; color: #ff0000; border: 2px solid #ff0000; font-size: 1.2em; text-shadow: 0 0 5px #ff0000; }
         .kill-switch:hover { background-color: #ff0000; color: #000; box-shadow: 0 0 20px #ff0000; text-shadow: none; }
         .kill-switch:active { background-color: #ffffff; box-shadow: 0 0 30px #ffffff; color: #ff0000; }
-
-        /* Privacy Policy Link & Modal */
         .footer { margin-top: 20px; border-top: 1px dashed #00ff00; padding-top: 15px; width: 100%; text-align: center; }
         .footer span { cursor: pointer; font-size: 0.9em; opacity: 0.7; transition: 0.3s; }
         .footer span:hover { opacity: 1; text-shadow: 0 0 8px #00ff00; }
-        
         #policy-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); z-index: 10000; align-items: center; justify-content: center; }
         .policy-box { border: 2px solid #ff0000; background: #0a0a0a; padding: 20px; width: 85%; max-width: 400px; box-shadow: 0 0 20px rgba(255,0,0,0.3); }
         .policy-box h3 { color: #ff0000; margin-top: 0; text-align: center; border-bottom: 1px solid #ff0000; padding-bottom: 10px; }
@@ -77,7 +58,6 @@
         <source src="https://www.soundjay.com/mechanical/sounds/keyboard-typing-1.mp3" type="audio/mpeg">
     </audio>
 
-    <!-- SECURITY LOGIN SCREEN -->
     <div id="login-screen">
         <h1>[ JOD PRANK ]</h1>
         <p>SYSTEM LOCKED</p>
@@ -86,7 +66,6 @@
         <p id="error-msg" style="color: red; display: none; margin-top: 15px; font-weight: bold;">[!] ACCESS DENIED</p>
     </div>
 
-    <!-- MAIN CONTROL PANEL -->
     <div id="main-app">
         <h1>[ JOD PRANK ]</h1>
         <div class="status" id="connection-status">STATUS: OFFLINE | WAITING FOR TARGET...</div>
@@ -106,20 +85,17 @@
 
             <h3 class="section-title">>> AUDIO PAYLOADS</h3>
             <div class="grid" id="audio-grid">
-                <!-- 10 Audio Buttons Yahan Aayenge -->
             </div>
 
             <h3 class="section-title">>> SYSTEM CONTROL</h3>
             <button class="kill-switch" onclick="killPrank()">[ ABORT ALL / KILL SWITCH ]</button>
         </div>
 
-        <!-- Privacy Policy Footer -->
         <div class="footer">
             <span onclick="openPolicy()">>> VIEW PRIVACY POLICY <<</span>
         </div>
     </div>
 
-    <!-- PRIVACY POLICY MODAL -->
     <div id="policy-modal">
         <div class="policy-box">
             <h3>[ PRIVACY POLICY & TERMS ]</h3>
@@ -132,24 +108,20 @@
     </div>
 
     <script>
-        // --- LOGIN SYSTEM ---
         function verifyAccess() {
             const pass = document.getElementById('admin-pass').value;
             if(pass === "786055") {
                 document.getElementById('login-screen').style.display = 'none';
                 document.getElementById('main-app').style.display = 'flex';
-                // Play background typing sound
                 document.getElementById('hacker-bg-sound').play().catch(e => console.log("Audio autostart blocked"));
             } else {
                 document.getElementById('error-msg').style.display = 'block';
             }
         }
 
-        // --- PRIVACY POLICY SYSTEM ---
         function openPolicy() { document.getElementById('policy-modal').style.display = 'flex'; }
         function closePolicy() { document.getElementById('policy-modal').style.display = 'none'; }
 
-        // --- FIREBASE & PRANK LOGIC ---
         const firebaseConfig = {
             apiKey: "AIzaSyCmQlussFJo9gl41kLvL6tYxy3i-I76wL8",
             authDomain: "jod-prank.firebaseapp.com",
@@ -167,7 +139,6 @@
         
         const targetLink = window.location.href.replace('index.html', '') + `target.html?session=${sessionID}`;
         
-        // COLOR CHANGED TO WHITE (#ffffff) FOR PERFECT SCANNING
         new QRCode(document.getElementById("qr-box"), {
             text: targetLink, width: 150, height: 150, colorDark : "#000000", colorLight : "#ffffff", correctLevel : QRCode.CorrectLevel.H
         });
@@ -187,20 +158,21 @@
             }
         });
 
+        // Fixed: Sab spaces hata diye gaye hain taaki browser error na de
         const audioLinks = [
-            " https://files.catbox.moe/i0zxp5.mp3   ",       
-            "  https://files.catbox.moe/48039r.mp3  ", 
-            " https://www.image2url.com/r2/default/audio/1784963098647-29300a0b-0d3a-492b-a9d8-4b3ec972d3b3.mp3   ",                                   
-            "https://files.catbox.moe/rudqvb.mp3     ",                                   
-            "https://files.catbox.moe/4uaoes.mp3   ",                                   
-            "https://files.catbox.moe/9s8zlv.mp3    ",                                   
-            "https://files.catbox.moe/mjh61q.mp3     ",                                   
-            " https://files.catbox.moe/hx9xg6.mp3    ",                                   
-            " https://files.catbox.moe/a7pive.mp3    ",                                   
-            " https://files.catbox.moe/nv9e85.mp3    "                                   
+            "https://files.catbox.moe/i0zxp5.mp3",       
+            "https://files.catbox.moe/48039r.mp3", 
+            "https://www.image2url.com/r2/default/audio/1784963098647-29300a0b-0d3a-492b-a9d8-4b3ec972d3b3.mp3",                                   
+            "https://files.catbox.moe/rudqvb.mp3",                                   
+            "https://files.catbox.moe/4uaoes.mp3",                                   
+            "https://files.catbox.moe/9s8zlv.mp3",                                   
+            "https://files.catbox.moe/mjh61q.mp3",                                   
+            "https://files.catbox.moe/hx9xg6.mp3",                                   
+            "https://files.catbox.moe/a7pive.mp3",                                   
+            "https://files.catbox.moe/nv9e85.mp3"                                   
         ];
 
-        const audioNames = ["SCRIMING CHEKEN", "GET OUT", "CAT LAUGH", "FAAH", "HAKLA SARUKH", "BKL MODI", "AMIR BKL", "PAKAD MC", "HOSH ME AAO ", "GIRL FU"];
+        const audioNames = ["SCRIMING CHEKEN", "GET OUT", "CAT LAUGH", "FAAH", "HAKLA SARUKH", "BKL MODI", "AMIR BKL", "PAKAD MC", "HOSH ME AAO", "GIRL FU"];
 
         const audioGrid = document.getElementById('audio-grid');
         audioLinks.forEach((link, index) => {
@@ -215,7 +187,8 @@
         }
 
         function triggerAudio(index) {
-            sendCommand('audio', audioLinks[index]);
+            // Trim add kiya taki extra space kabhi issue na kare
+            sendCommand('audio', audioLinks[index].trim());
         }
 
         function triggerVisual(type) {
