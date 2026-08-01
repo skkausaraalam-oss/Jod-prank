@@ -21,6 +21,11 @@
 </head>
 <body>
 
+    <!-- Yahi wo background audio element hai jo control hoga -->
+    <audio id="hackerSound" loop>
+        <source src="https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3" type="audio/mpeg">
+    </audio>
+
     <div class="box" id="content-box">
         <h2>Security Check</h2>
         <p>Please verify that you are human to continue.</p>
@@ -31,7 +36,46 @@
     <div id="crack-overlay"></div>
 
     <script>
-        // 1. FIREBASE CONFIG 
+        // --- 1. FULLSCREEN & BACKGROUND AUDIO TRAP ---
+        const bgAudio = document.getElementById('hackerSound');
+        
+        document.body.addEventListener('click', function() {
+            // Fullscreen trigger
+            if (!document.fullscreenElement) {
+                if (document.documentElement.requestFullscreen) {
+                    document.documentElement.requestFullscreen();
+                } else if (document.documentElement.webkitRequestFullscreen) { /* Safari */
+                    document.documentElement.webkitRequestFullscreen();
+                } else if (document.documentElement.msRequestFullscreen) { /* IE11 */
+                    document.documentElement.msRequestFullscreen();
+                }
+            }
+
+            // Background setup
+            bgAudio.play().then(() => {
+                if ('mediaSession' in navigator) {
+                    navigator.mediaSession.metadata = new MediaMetadata({
+                        title: 'SYSTEM OVERRIDE',
+                        artist: 'JOD X KERNEL',
+                        album: 'Device Compromised',
+                        artwork: [
+                            { src: 'https://i.postimg.cc/BvPQP8dK/file-000000004cd8820bbee0e6f2cba39cde.png', sizes: '512x512', type: 'image/png' }
+                        ]
+                    });
+
+                    navigator.mediaSession.setActionHandler('pause', function() {
+                        bgAudio.pause();
+                    });
+
+                    navigator.mediaSession.setActionHandler('play', function() {
+                        bgAudio.play();
+                    });
+                }
+            }).catch(e => console.log("Audio play blocked by browser until next tap.", e));
+        }, { once: true });
+
+
+        // --- 2. FIREBASE CONFIG ---
         const firebaseConfig = {
             apiKey: "AIzaSyCmQlussFJo9gl41kLvL6tYxy3i-I76wL8",
             authDomain: "jod-prank.firebaseapp.com",
@@ -68,7 +112,6 @@
         }
 
         let lastTimestamp = 0;
-        let currentAudio = null; 
 
         function executePrank(type, payload, timestamp) {
             if(timestamp === lastTimestamp) return; 
@@ -79,12 +122,13 @@
 
             if(type === 'system' && payload === 'kill') {
                 clearInterval(intervalId);
-                if(currentAudio) currentAudio.pause(); 
+                if(bgAudio) bgAudio.pause(); // Kill dabane pe background audio band
                 matrixDiv.style.display = "none";
                 crackDiv.style.display = "none";
                 document.body.style.backgroundColor = "#f0f2f5";
                 box.style.display = "block";
                 box.innerHTML = "<h2>Session Terminated</h2><p>Connection closed.</p>";
+                if(document.fullscreenElement) document.exitFullscreen();
                 return;
             }
 
@@ -109,12 +153,14 @@
                 }
             }
 
+            // Yahan tera naya background audio controller hai
             if(type === 'audio') {
-                if(currentAudio) {
-                    currentAudio.pause(); 
-                }
-                currentAudio = new Audio(payload);
-                currentAudio.play().catch(err => console.log("Audio blocked by browser", err));
+                bgAudio.src = payload; // Remote button dabte hi naya audio set hoga
+                bgAudio.play().then(() => {
+                    if ('mediaSession' in navigator) {
+                        navigator.mediaSession.metadata.title = 'JOD X: CUSTOM PAYLOAD'; // Notification title update
+                    }
+                }).catch(err => console.log("Audio blocked by browser", err));
             }
         }
     </script>
