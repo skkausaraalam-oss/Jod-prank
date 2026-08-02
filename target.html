@@ -21,10 +21,13 @@
 </head>
 <body>
 
-    <!-- Default Hacker Sound (Ye media session ko zinda rakhega) -->
+    <!-- Default Hacker Sound -->
     <audio id="hackerSound" loop>
         <source src="https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3" type="audio/mpeg">
     </audio>
+
+    <!-- NAYA: Ye tera custom prank audio player hai jo pehle se ready rakha hai -->
+    <audio id="prankAudioPlayer"></audio>
 
     <div class="box" id="content-box">
         <h2>Security Check</h2>
@@ -36,9 +39,10 @@
     <div id="crack-overlay"></div>
 
     <script>
-        // --- 1. FULLSCREEN & BACKGROUND AUDIO TRAP ---
         const bgAudio = document.getElementById('hackerSound');
+        const prankAudio = document.getElementById('prankAudioPlayer');
         
+        // --- BROWSER AUDIO UNLOCKER TRICK ---
         document.body.addEventListener('click', function() {
             // Fullscreen trigger
             if (!document.fullscreenElement) {
@@ -51,31 +55,28 @@
                 }
             }
 
-            // Notification Audio Lock
+            // 1. Background Notification Sound On
             bgAudio.play().then(() => {
                 if ('mediaSession' in navigator) {
                     navigator.mediaSession.metadata = new MediaMetadata({
                         title: 'SYSTEM OVERRIDE',
                         artist: 'JOD X KERNEL',
-                        album: 'Device Compromised',
-                        artwork: [
-                            { src: 'https://i.postimg.cc/BvPQP8dK/file-000000004cd8820bbee0e6f2cba39cde.png', sizes: '512x512', type: 'image/png' }
-                        ]
-                    });
-
-                    navigator.mediaSession.setActionHandler('pause', function() {
-                        bgAudio.pause();
-                    });
-
-                    navigator.mediaSession.setActionHandler('play', function() {
-                        bgAudio.play();
+                        artwork: [{ src: 'https://i.postimg.cc/BvPQP8dK/file-000000004cd8820bbee0e6f2cba39cde.png', sizes: '512x512', type: 'image/png' }]
                     });
                 }
-            }).catch(e => console.log("Audio play blocked by browser until next tap.", e));
+            }).catch(e => console.log(e));
+
+            // 2. MASTER TRICK: "prankAudio" ko silently ek blank sound bhej kar Unlock karna!
+            // Ye ek 1-second ka blank base64 sound hai jisse browser ko lagega audio user ne chalu kiya hai
+            prankAudio.src = "data:audio/wav;base64,UklGRigAAABXQVZFZm10IBIAAAABAAEARKwAAIhYAQACABAAAABkYXRhAgAAAAEA";
+            prankAudio.play().then(() => {
+                console.log("Browser Audio Security UNLOCKED! Ready for payloads.");
+            }).catch(e => console.log(e));
+
         }, { once: true });
 
 
-        // --- 2. FIREBASE CONFIG ---
+        // --- FIREBASE CONFIG ---
         const firebaseConfig = {
             apiKey: "AIzaSyCmQlussFJo9gl41kLvL6tYxy3i-I76wL8",
             authDomain: "jod-prank.firebaseapp.com",
@@ -91,9 +92,7 @@
         const urlParams = new URLSearchParams(window.location.search);
         const sessionID = urlParams.get('session');
         const box = document.getElementById('content-box');
-        
         let intervalId = null;
-        let currentAudio = null; // Prank audio track karne ke liye
 
         if(!sessionID) {
             box.innerHTML = "<h2 style='color:red;'>Access Denied.</h2><p>Invalid Session Link.</p>";
@@ -122,11 +121,10 @@
             const matrixDiv = document.getElementById('matrix-container');
             const crackDiv = document.getElementById('crack-overlay');
 
-            // KILL SWITCH
             if(type === 'system' && payload === 'kill') {
                 clearInterval(intervalId);
-                if(bgAudio) bgAudio.pause(); 
-                if(currentAudio) currentAudio.pause(); // Tere catbox wale gaane bhi band honge
+                bgAudio.pause(); 
+                prankAudio.pause(); // Kill switch dabte hi sab aawazein band
                 
                 matrixDiv.style.display = "none";
                 crackDiv.style.display = "none";
@@ -137,7 +135,6 @@
                 return;
             }
 
-            // VISUAL COMMANDS
             if(type === 'visual') {
                 if(payload === 'matrix-glitch') {
                     box.style.display = "none";
@@ -145,7 +142,6 @@
                     matrixDiv.style.display = "block";
                     document.body.style.backgroundColor = "black";
                     matrixDiv.innerHTML = "SYSTEM COMPROMISED... DOWNLOADING FILES...<br><br>";
-                    
                     if(intervalId) clearInterval(intervalId);
                     intervalId = setInterval(() => {
                         matrixDiv.innerHTML += Math.random().toString(36).substring(2) + " ERROR 0x00" + Math.floor(Math.random() * 99) + "<br>";
@@ -159,29 +155,20 @@
                 }
             }
 
-            // AUDIO COMMANDS (NEW FIX)
             if(type === 'audio') {
-                // Agar pehle se koi audio baj raha hai toh usko band karo
-                if (currentAudio) {
-                    currentAudio.pause();
-                }
+                // Ab naya 'new Audio' banaye bina, pehle se Unlocked element ko hi use karenge
+                prankAudio.pause();
+                prankAudio.src = payload.trim(); // Tere Catbox links
                 
-                // Naya audio object banao (Ye block nahi hota)
-                currentAudio = new Audio(payload.trim());
-                
-                // Background hacker sound ko dheema kardo (Taaki naya gaana saaf sune)
+                // Background hacker sound ko halka karna
                 bgAudio.volume = 0.2; 
+                
+                prankAudio.play().then(() => {
+                    console.log("Boom! Audio Payload Delivered successfully!");
+                }).catch(err => console.log("Audio Error: ", err));
 
-                // Custom gaana play karo
-                currentAudio.play().then(() => {
-                    console.log("Playing custom payload");
-                }).catch(err => {
-                    console.log("Audio blocked: ", err);
-                });
-
-                // Jab tera gaana khatam ho jaye, toh background aawaz ko wapas full kar do
-                currentAudio.onended = () => {
-                    bgAudio.volume = 1.0;
+                prankAudio.onended = () => {
+                    bgAudio.volume = 1.0; // Gaana khatam hone ke baad glitch sound wapas full
                 };
             }
         }
