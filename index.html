@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+'<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -11,18 +11,6 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
-    
-    <script>
-        if ('serviceWorker' in navigator) {
-            window.addEventListener('load', () => {
-                navigator.serviceWorker.register('sw.js').then(reg => {
-                    console.log('PWA Service Worker Registered!', reg);
-                }).catch(err => {
-                    console.log('Service Worker registration failed: ', err);
-                });
-            });
-        }
-    </script>
     
     <style>
         body { background-color: #050505; color: #00ff00; font-family: 'Courier New', Courier, monospace; margin: 0; padding: 0; }
@@ -158,7 +146,7 @@
             }
         });
 
-        // Fixed: Sab spaces hata diye gaye hain taaki browser error na de
+        // 20 AUDIO LINKS (Apne links yahan replace kar lena)
         const audioLinks = [
             "https://files.catbox.moe/i0zxp5.mp3",       
             "https://files.catbox.moe/48039r.mp3", 
@@ -169,15 +157,43 @@
             "https://files.catbox.moe/mjh61q.mp3",                                   
             "https://files.catbox.moe/hx9xg6.mp3",                                   
             "https://files.catbox.moe/a7pive.mp3",                                   
-            "https://files.catbox.moe/nv9e85.mp3"                                   
+            "https://files.catbox.moe/nv9e85.mp3",
+            
+            "  https://files.catbox.moe/up8h9g.mp3  ",
+            
+            "https://files.catbox.moe/n1tjar.mp3  ",
+            
+            "  https://files.catbox.moe/ssqhju.mp3 ",
+            
+            " https://www.image2url.com/r2/default/audio/1784966049724-392d6d63-9536-46b9-9112-d21e35c82e6f.mp3   ",
+            
+            "   https://files.catbox.moe/0owzgf.mp3 ",
+            
+            "  https://files.catbox.moe/ruknnn.mp3 ",
+            
+            " https://files.catbox.moe/b5cdh2.mp3  ",
+            
+            " https://files.catbox.moe/vq4lk3.mp3  ",
+            
+            " https://files.catbox.moe/cuiqui.mp3 ",
+            
+            " https://files.catbox.moe/8d8cfm.mp3 "
         ];
 
-        const audioNames = ["SCRIMING CHEKEN", "GET OUT", "CAT LAUGH", "FAAH", "HAKLA SARUKH", "BKL MODI", "AMIR BKL", "PAKAD MC", "HOSH ME AAO", "GIRL FU"];
+        // 20 AUDIO NAAM (Apne naam yahan replace kar lena)
+        const audioNames = [
+            "SCRIMING CHEKEN", "GET OUT", "CAT LAUGH", "FAAH", "HAKLA SARUKH", 
+            "BKL MODI", "AMIR BKL", "PAKAD MC", "HOSH ME AAO", "GIRL FU",
+            "AMMA AUDIO", " CHUT", " CHUT GAYI", " MODI SAIYARA", "GAND PE RAPTA  ",
+            "KYU RE MC  ", "  GAY ", "SPIDER MAN ", " BHISADI KE ", " CID "
+        ];
 
         const audioGrid = document.getElementById('audio-grid');
         audioLinks.forEach((link, index) => {
             const btn = document.createElement('button');
-            btn.innerText = `${audioNames[index]} [0${index + 1}]`;
+            // '01', '02' format maintain karne ke liye
+            let num = (index + 1 < 10) ? '0' + (index + 1) : (index + 1);
+            btn.innerText = `${audioNames[index]} [${num}]`;
             btn.onclick = () => triggerAudio(index);
             audioGrid.appendChild(btn);
         });
@@ -187,7 +203,6 @@
         }
 
         function triggerAudio(index) {
-            // Trim add kiya taki extra space kabhi issue na kare
             sendCommand('audio', audioLinks[index].trim());
         }
 
